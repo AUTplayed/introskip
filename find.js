@@ -1,5 +1,12 @@
 chrome.runtime.sendMessage(undefined, JSON.stringify({status:0}), undefined, function(msg) {
 	msg = JSON.parse(msg);
+	document.getElementsByTagName("video")[0].onloadedmetadata = function() {
+		chrome.runtime.sendMessage(undefined, JSON.stringify({status:5}));
+		execute(msg);
+	}
+});
+
+function execute(msg) {
 	introskip.init();
 	switch(msg.action) {
 		case 0:
@@ -9,8 +16,7 @@ chrome.runtime.sendMessage(undefined, JSON.stringify({status:0}), undefined, fun
 			save(msg);
 			break;
 	}
-	
-});
+}
 
 function find(msg) {
 	introskip.max = msg.max;
@@ -60,7 +66,7 @@ var introskip = {
 		setTimeout(()=> {
 			introskip.saved = introskip.getFrame()
 			if(cb) cb(introskip.saved);
-		}, 5000);
+		}, 3000);
 	},
 	onseeked: function() {
 		var frame = introskip.getFrame();

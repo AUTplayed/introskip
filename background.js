@@ -2,11 +2,11 @@ var saved;
 var action;
 var url;
 var time;
-var tab;
+var activeTab;
 
 function getTab(cb) {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		tab = tabs[0].id;
+		activeTab = tabs[0].id;
 		cb(tabs[0].id);
 	});
 }
@@ -34,6 +34,7 @@ async function save() {
 
 function newtab() {
 	chrome.tabs.create({url:url}, (tab) => {
+		chrome.tabs.update(tab.id, {muted:true});
 		chrome.tabs.executeScript(tab.id, {
 			file: 'find.js'
 		});
@@ -56,7 +57,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, respond) {
 		case 1:
 			respond(JSON.stringify({})); // kill tab
 			console.log("received: "+ msg.time);
-			chrome.tabs.sendMessage(tab, JSON.stringify({status:4, time:msg.time}));
+			chrome.tabs.sendMessage(activeTab, JSON.stringify({status:4, time:msg.time}));
 			break;
 		case 2:
 			url = msg.url;
@@ -64,9 +65,12 @@ chrome.runtime.onMessage.addListener(function(msg, sender, respond) {
 			newtab();
 			break;
 		case 3:
-		respond(JSON.stringify({})); // kill tab
+			respond(JSON.stringify({})); // kill tab
 			saved = msg.saved; // save saved frame
 			console.log("got saved")
+			break;
+		case 5:
+			chrome.tabs.update(activeTab, {highlighted: true}); // switch back to main tab
 			break;
 	}
 });
