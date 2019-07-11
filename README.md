@@ -1,1 +1,1 @@
-chrome extension to display the data from the android app https://github.com/AUTplayed/NotificationListenerApp
+skip intros for streamed series
